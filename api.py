@@ -1,4 +1,5 @@
 import json
+from configparser import ConfigParser
 
 import requests
 from flask import Flask, jsonify
@@ -6,7 +7,13 @@ from pymongo import MongoClient
 
 app = Flask(__name__)
 
-client = MongoClient('localhost', 27017)
+parser = ConfigParser()
+parser.read('api.ini')
+
+mongo_endpoint = parser.get('mongo', 'endpoint')
+mongo_port = int(parser.get('mongo', 'port'))
+api_key = parser.get('open_api', 'api_key')
+client = MongoClient(mongo_endpoint, mongo_port)
 db = client.yummy_restaurant
 
 
@@ -19,7 +26,7 @@ def facilities():
 @app.route('/api/init', methods=['POST'])
 def init():
     params = {
-        'key': 'cb8afdf02e874e858b1ad9ff6be5cf93',
+        'key': api_key,
         'Type': 'json'
     }
 

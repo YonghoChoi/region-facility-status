@@ -1,3 +1,5 @@
+import json
+
 import requests
 from flask import Flask, jsonify
 from pymongo import MongoClient
@@ -5,13 +7,13 @@ from pymongo import MongoClient
 app = Flask(__name__)
 
 client = MongoClient('localhost', 27017)
-db = client.dbsparta
+db = client.yummy_restaurant
 
 
 @app.route('/api/list', methods=['GET'])
 def facilities():
-    datas = list(db.facility.find({}, {'_id': False}).sort('like', -1))
-    return jsonify({'result': 'success', 'facilities': datas})
+    datas = list(db.facility.find({}, {'_id': False}))
+    return jsonify({'result': 'success', 'datas': datas})
 
 
 @app.route('/api/init', methods=['POST'])
@@ -39,11 +41,13 @@ def init():
 
         statuses.extend(d['row'])
 
-    return jsonify({'result': 'success', 'data': statuses})
+    db.facility.insert_many(statuses)
+    return json.dumps({'result': 'success', 'msg': f'{len(statuses)}개의 지역 화폐 정보를 갱신하였습니다.'})
 
 
 @app.route('/api/delete', methods=['POST'])
 def delete():
+    db.facility.drop()
     return jsonify({'result': 'success', 'msg': '삭제 되었습니다!'})
 
 

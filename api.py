@@ -12,7 +12,8 @@ parser.read('api.ini')
 
 mongo_endpoint = parser.get('mongo', 'endpoint')
 mongo_port = int(parser.get('mongo', 'port'))
-api_key = parser.get('open_api', 'api_key')
+open_api_endpoint = parser.get('open_api', 'endpoint')
+open_api_key = parser.get('open_api', 'api_key')
 client = MongoClient(mongo_endpoint, mongo_port)
 db = client.yummy_restaurant
 
@@ -26,11 +27,11 @@ def facilities():
 @app.route('/api/init', methods=['POST'])
 def init():
     params = {
-        'key': api_key,
+        'key': open_api_key,
         'Type': 'json'
     }
 
-    res = requests.get('https://openapi.gg.go.kr/RegionMnyFacltStus', params)
+    res = requests.get(open_api_endpoint, params)
     if res.status_code != 200:
         return jsonify({'result': 'error', 'msg': f"error : status code is {res.status_code}"})
 
